@@ -1,125 +1,43 @@
-/* ======================================
-   Fredys Haussuche
-   app.js
-====================================== */
+document.addEventListener("DOMContentLoaded", () => {
 
-const searchButton = document.querySelector("button");
-const cards = document.querySelector(".cards");
+    const button = document.getElementById("searchButton");
 
-// Beispieldaten (werden später durch echte Suchergebnisse ersetzt)
-const demoHouses = [
-{
-    title: "Einfamilienhaus in Wees",
-    rooms: 5,
-    rent: 1450,
-    area: 142,
-    location: "24999 Wees"
-},
-{
-    title: "Doppelhaushälfte in Munkbrarup",
-    rooms: 4,
-    rent: 1350,
-    area: 126,
-    location: "24960 Munkbrarup"
-},
-{
-    title: "Haus in Flensburg-Mürwik",
-    rooms: 6,
-    rent: 1690,
-    area: 168,
-    location: "24944 Flensburg"
-}
-];
+    button.addEventListener("click", () => {
 
-function renderResults(list){
+        const ort = document.querySelectorAll("input")[0].value;
+        const radius = document.querySelectorAll("input")[1].value;
+        const zimmer = document.querySelectorAll("input")[2].value;
+        const miete = document.querySelectorAll("input")[3].value;
 
-    cards.innerHTML = "";
+        const suchtext =
+            encodeURIComponent(
+                `Haus zur Miete ${ort} ${radius} km mindestens ${zimmer} Zimmer ${miete} Euro`
+            );
 
-    if(list.length === 0){
+        const seiten = [
 
-        cards.innerHTML = `
-        <div class="card">
-            <h2>Keine Treffer</h2>
-            <p>Momentan wurden keine passenden Häuser gefunden.</p>
-        </div>
-        `;
-        return;
-    }
+            `https://www.google.de/search?q=${suchtext}+Immobilienscout24`,
 
-    list.forEach(house=>{
+            `https://www.google.de/search?q=${suchtext}+Immowelt`,
 
-        cards.innerHTML += `
-        <div class="card">
+            `https://www.google.de/search?q=${suchtext}+Immonet`,
 
-            <h2>${house.title}</h2>
+            `https://www.google.de/search?q=${suchtext}+Kleinanzeigen`,
 
-            <p>📍 ${house.location}</p>
+            `https://www.google.de/search?q=${suchtext}+Ohne-Makler`
 
-            <p>🛏️ ${house.rooms} Zimmer</p>
+        ];
 
-            <p>📐 ${house.area} m²</p>
+        seiten.forEach((seite, index) => {
 
-            <p>💶 ${house.rent} €/Monat</p>
+            setTimeout(() => {
 
-            <button class="favorite">❤️ Favorit</button>
+                window.open(seite, "_blank");
 
-        </div>
-        `;
-    });
-
-    addFavoriteEvents();
-
-}
-
-function search(){
-
-    const inputs=document.querySelectorAll("input");
-
-    const rooms=parseInt(inputs[2].value)||0;
-
-    const maxRent=parseInt(inputs[3].value)||999999;
-
-    const results=demoHouses.filter(house=>{
-
-        return house.rooms>=rooms &&
-               house.rent<=maxRent;
-
-    });
-
-    renderResults(results);
-
-}
-
-function addFavoriteEvents(){
-
-    const buttons=document.querySelectorAll(".favorite");
-
-    buttons.forEach(button=>{
-
-        button.addEventListener("click",()=>{
-
-            button.innerHTML="✅ Gespeichert";
-
-            button.disabled=true;
-
-            button.style.background="#d9a441";
+            }, index * 400);
 
         });
 
     });
 
-}
-
-searchButton.addEventListener("click",search);
-
-// Beim Laden automatisch anzeigen
-renderResults(demoHouses);
-
-// Registrierung des Service Workers (für die PWA)
-if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-        navigator.serviceWorker.register("./service-worker.js")
-            .then(() => console.log("Service Worker registriert"))
-            .catch(err => console.log("Fehler:", err));
-    });
-}
+});
